@@ -112,7 +112,7 @@ public class MahasiswaController {
 		
 		
 		Object[] rowData = {data.getNIM(), data.getFirst_name(), 
-				data.getLast_name(), data.getFirst_name()};
+				data.getLast_name(), data.getProdi()};
 		
 		int idx = search_iterative(data.getNIM());
 //		int idx = search_recursive(nim, 0, students.size()-1);
