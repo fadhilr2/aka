@@ -48,38 +48,44 @@ public class MahasiswaController {
 	
 	// TODO; binary search based on NIM, 
 	// return array index if found, otherwise return -1
-	public int search_iterative(long nim) {
+	public int[] search_iterative(long nim) {
 	    int left = 0;
 	    int right = students.size() - 1;
+	    int ops = 0; 
 
 	    while (left <= right) {
+	        ops++; 
 	        int mid = left + (right - left) / 2;
 	        long midNIM = students.get(mid).getNIM();
 
 	        if (midNIM == nim) {
-	            return mid;
+	            return new int[]{mid, ops}; 
 	        } else if (midNIM < nim) {
 	            left = mid + 1;
 	        } else {
 	            right = mid - 1;
 	        }
 	    }
-	    return -1;
+	    return new int[]{-1, ops}; 
 	}
 	
-	public int search_recursive(long nim, int left, int right) {
-		if (left > right) {
-		        return -1;
-		    }
+	public int[] search_recursive(long nim, int left, int right, int currentOps) {
+	    currentOps++; 
+
+	    if (left > right) {
+	        return new int[]{-1, currentOps};
+	    }
+
 	    int mid = left + (right - left) / 2;
 	    long midNIM = students.get(mid).getNIM();
 
 	    if (midNIM == nim) {
-	        return mid;
-	    }else if (midNIM < nim) {
-	        return search_recursive(nim, mid + 1, right);
-	    }else {
-	        return search_recursive(nim, left, mid - 1);}
+	        return new int[]{mid, currentOps};
+	    } else if (midNIM < nim) {
+	        return search_recursive(nim, mid + 1, right, currentOps);
+	    } else {
+	        return search_recursive(nim, left, mid - 1, currentOps);
+	    }
 	}
 	
 	//yg ini masih error g tau kenapa
@@ -114,14 +120,15 @@ public class MahasiswaController {
 		Object[] rowData = {data.getNIM(), data.getFirst_name(), 
 				data.getLast_name(), data.getProdi()};
 		
-		int idx = search_iterative(data.getNIM());
+		int[] res = search_iterative(data.getNIM());
+		int idx = res[0];
 //		int idx = search_recursive(nim, 0, students.size()-1);
 		if(idx != -1) {
-			v.showErrorMessage("NIM " + data.getNIM() + " Sudah ada");
+			v.showErrorMessage("NIM " + data.getNIM() + " Sudah ada \n jumlah operasi " + res[1]);
 		} else {
 			students.add(data);
 			model.addRow(rowData);
-			v.showMessage("Mahasiswa berhasil ditambahkan.");
+			v.showMessage("Mahasiswa berhasil ditambahkan.\n jumlah operasi " + res[1]);
 			Collections.sort(students);
 
 		}
@@ -136,17 +143,16 @@ public class MahasiswaController {
 			return;
 		}
 		
-		int idx = search_iterative(data.getNIM());
-//		int idx = search_recursive(nim, 0, students.size()-1);
-		
+		int[] res = search_iterative(data.getNIM());
+		int idx = res[0];
 		if(idx == -1) {
-			v.showErrorMessage("Mahasiswa dengan nim " + data.getNIM() + " tidak ditemukan.");
+			v.showErrorMessage("Mahasiswa dengan nim " + data.getNIM() + " tidak ditemukan.\n jumlah operasi " + res[1]);
 		} else {
 			model.setValueAt(data.getNIM(), idx, 0);
 		    model.setValueAt(data.getFirst_name(), idx, 1);
 		    model.setValueAt(data.getLast_name(), idx, 2);
 		    model.setValueAt(data.getProdi(), idx, 3);
-			v.showMessage("Mahasiswa dengan nim " + data.getNIM() + " berhasil diperbarui.");
+			v.showMessage("Mahasiswa dengan nim " + data.getNIM() + " berhasil diperbarui.\n jumlah operasi " + res[1]);
 			Collections.sort(students);
 
 		}
@@ -160,15 +166,14 @@ public class MahasiswaController {
 		}
 		long nim = Long.parseLong(nimStr);
 		
-		int idx = search_iterative(nim);
-//		int idx = search_recursive(nim, 0, students.size()-1);
-		
+		int[] res = search_iterative(nim);
+		int idx = res[0];
 		if(idx == -1) {
-			v.showErrorMessage("Mahasiswa dengan nim " + nimStr + " tidak ditemukan.");
+			v.showErrorMessage("Mahasiswa dengan nim " + nimStr + " tidak ditemukan.\n jumlah operasi " + res[1]);
 		} else {
 			students.remove(idx);
 			model.removeRow(idx);
-			v.showMessage("Mahasiswa berhasil dihapus");
+			v.showMessage("Mahasiswa berhasil dihapus\n jumlah operasi " + res[1]);
 			Collections.sort(students);
 		}
 	}
@@ -182,20 +187,19 @@ public class MahasiswaController {
 	    long nim = Long.parseLong(text);
 
 	    // pilih salah satu
-	    int index = search_iterative(nim);
-	    // int index = search_recursive(nim);
-
+	     int[] res = search_iterative(nim);
+	     int index = res[0];
 	    if (index != -1) {
 	        Mahasiswa m = students.get(index);
 	        v.showMessage(
 	            "Data ditemukan:\n" +
 	            "NIM: " + m.getNIM() + "\n" +
 	            "Nama: " + m.getFirst_name() + " " + m.getLast_name() + "\n" +
-	            "Prodi: " + m.getProdi()
+	            "Prodi: " + m.getProdi() + "\n jumlah operasi " + res[1]
 	        );
 	        v.highlightRow(index);
 	    } else {
-	        v.showErrorMessage("Data mahasiswa tidak ditemukan");
+	        v.showErrorMessage("Data mahasiswa tidak ditemukan \n jumlah operasi " + res[1]);
 	    }
 	}
 
